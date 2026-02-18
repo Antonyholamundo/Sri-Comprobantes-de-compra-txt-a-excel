@@ -1,0 +1,12 @@
+/* Estilos personalizados */
+.drag-active {
+  border-color: #ff8c00 !important;
+  background-color: rgba(255, 140, 0, 0.1);
+}
+body {
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
