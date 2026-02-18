@@ -1,11 +1,20 @@
+<<<<<<< HEAD
 // Configuración de Tailwind
+=======
+// Tailwind Configuration
+>>>>>>> 1736c7ce30857b06e6307f04ca06be043c92d249
 tailwind.config = {
   theme: {
     extend: {
       colors: {
         ecuaplus: {
+<<<<<<< HEAD
           orange: "#FF8c00", // Naranja específico ajustado
           blue: "#0056b3", // Azul específico ajustado
+=======
+          orange: "#FF8c00", // Adjusted specific orange
+          blue: "#0056b3", // Adjusted specific blue
+>>>>>>> 1736c7ce30857b06e6307f04ca06be043c92d249
           darkblue: "#003366",
         },
       },
@@ -13,14 +22,22 @@ tailwind.config = {
   },
 };
 
+<<<<<<< HEAD
 // Lógica de la Aplicación
+=======
+// Application Logic
+>>>>>>> 1736c7ce30857b06e6307f04ca06be043c92d249
 document.addEventListener("DOMContentLoaded", () => {
   const dropZone = document.getElementById("drop-zone");
   const fileInput = document.getElementById("file-input");
   const statusArea = document.getElementById("status-area");
   const errorArea = document.getElementById("error-area");
 
+<<<<<<< HEAD
   // Eventos de Arrastrar y Soltar (Drag & Drop)
+=======
+  // Drag & Drop Events
+>>>>>>> 1736c7ce30857b06e6307f04ca06be043c92d249
   ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
     dropZone.addEventListener(eventName, preventDefaults, false);
   });
@@ -61,6 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function handleFiles(files) {
+<<<<<<< HEAD
     const validFiles = [];
     const invalidFiles = [];
 
@@ -84,6 +102,19 @@ document.addEventListener("DOMContentLoaded", () => {
     } else if (invalidFiles.length === 0 && files.length > 0) {
       showError("Por favor sube archivos de texto (.txt)");
     }
+=======
+    if (files.length > 0) {
+      const file = files[0];
+      if (
+        file.type === "text/plain" ||
+        file.name.toLowerCase().endsWith(".txt")
+      ) {
+        processFile(file);
+      } else {
+        showError("Por favor sube un archivo de texto (.txt)");
+      }
+    }
+>>>>>>> 1736c7ce30857b06e6307f04ca06be043c92d249
   }
 
   function showError(msg) {
@@ -92,6 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
     errorArea.classList.remove("hidden");
   }
 
+<<<<<<< HEAD
   // Envolver FileReader y PapaParse en una Promesa
   function readAndParseFile(file) {
     return new Promise((resolve, reject) => {
@@ -190,11 +222,53 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function generateExcel(data, originalFileName) {
     // Campos críticos para mantener como Texto
+=======
+  function processFile(file) {
+    // Reset UI
+    errorArea.classList.add("hidden");
+    statusArea.classList.remove("hidden");
+
+    const reader = new FileReader();
+
+    // CRITICAL: ISO-8859-1 encoding
+    reader.readAsText(file, "ISO-8859-1");
+
+    reader.onload = function (e) {
+      const csvData = e.target.result;
+
+      Papa.parse(csvData, {
+        header: true,
+        skipEmptyLines: true,
+        delimiter: "\t",
+        complete: function (results) {
+          if (results.errors.length > 0 && results.data.length === 0) {
+            showError("Error al leer el archivo. Verifica el formato.");
+            return;
+          }
+          try {
+            generateExcel(results.data, file.name);
+          } catch (err) {
+            showError("Error procesando datos: " + err.message);
+            console.error(err);
+          }
+        },
+      });
+    };
+
+    reader.onerror = function () {
+      showError("Error al leer el archivo.");
+    };
+  }
+
+  function generateExcel(data, originalFileName) {
+    // Critical Fields to keep as String
+>>>>>>> 1736c7ce30857b06e6307f04ca06be043c92d249
     const stringFields = [
       "RUC_EMISOR",
       "CLAVE_ACCESO",
       "IDENTIFICACION_RECEPTOR",
     ];
+<<<<<<< HEAD
     // Campos numéricos
     const numFields = ["VALOR_SIN_IMPUESTOS", "IVA", "IMPORTE_TOTAL"];
 
@@ -202,12 +276,26 @@ document.addEventListener("DOMContentLoaded", () => {
     let processedData = data.map((row) => {
       let newRow = { ...row };
 
+=======
+    // Number Fields for calculation
+    const numFields = ["VALOR_SIN_IMPUESTOS", "IVA", "IMPORTE_TOTAL"];
+
+    // Process Data
+    let processedData = data.map((row) => {
+      let newRow = { ...row };
+
+      // Enforce Strings
+>>>>>>> 1736c7ce30857b06e6307f04ca06be043c92d249
       stringFields.forEach((field) => {
         if (newRow[field]) {
           newRow[field] = String(newRow[field]);
         }
       });
 
+<<<<<<< HEAD
+=======
+      // Enforce Numbers and Handle Formats (commas vs dots)
+>>>>>>> 1736c7ce30857b06e6307f04ca06be043c92d249
       numFields.forEach((field) => {
         if (newRow[field]) {
           let val = String(newRow[field]).trim();
@@ -221,7 +309,11 @@ document.addEventListener("DOMContentLoaded", () => {
       return newRow;
     });
 
+<<<<<<< HEAD
     // Calcular Totales
+=======
+    // Calculate Totals
+>>>>>>> 1736c7ce30857b06e6307f04ca06be043c92d249
     let totalImporte = 0;
     let totalBase = 0;
     let totalIva = 0;
@@ -245,6 +337,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
+<<<<<<< HEAD
     // Crear Hoja de Cálculo
     const ws = XLSX.utils.json_to_sheet(processedData);
 
@@ -340,6 +433,42 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Fila 1: Totales de columnas específicas
+=======
+    // Create Worksheet
+    const ws = XLSX.utils.json_to_sheet(processedData);
+
+    // Set column width for better readability
+    const wscols = Object.keys(processedData[0] || {}).map((k) => ({
+      wch: 15,
+    }));
+    ws["!cols"] = wscols;
+
+    // Mark specific columns as Text to strictly prevent scientific notation
+    const range = XLSX.utils.decode_range(ws["!ref"]);
+    const headers = [];
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const cell = ws[XLSX.utils.encode_cell({ r: 0, c: C })];
+      if (cell) headers[C] = cell.v;
+    }
+
+    // Iterate over all data cells for critical columns and set type to 's' (string)
+    for (let R = range.s.r + 1; R <= range.e.r; ++R) {
+      for (let C = range.s.c; C <= range.e.c; ++C) {
+        const header = headers[C];
+        if (stringFields.includes(header)) {
+          const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
+          if (!ws[cellRef]) continue;
+          ws[cellRef].t = "s"; // Force string type
+          ws[cellRef].z = "@"; // Force text format
+        }
+      }
+    }
+
+    // Append Totals to the Sheet
+    const lastRow = range.e.r + 2;
+
+    // Row 1: Totals of specific columns
+>>>>>>> 1736c7ce30857b06e6307f04ca06be043c92d249
     let colBase = headers.indexOf("VALOR_SIN_IMPUESTOS");
     let colIva = headers.indexOf("IVA");
     let colTotal = headers.indexOf("IMPORTE_TOTAL");
@@ -350,25 +479,42 @@ document.addEventListener("DOMContentLoaded", () => {
     if (colIva !== -1) rowTotals[colIva] = totalIva;
     if (colTotal !== -1) rowTotals[colTotal] = totalImporte;
 
+<<<<<<< HEAD
     // Fila 2: Subtotal IVA Grabado
+=======
+    // Row 2: Subtotal IVA Grabado
+>>>>>>> 1736c7ce30857b06e6307f04ca06be043c92d249
     let rowSubGrabado = new Array(headers.length).fill("");
     rowSubGrabado[0] = "Subtotal IVA Grabado (>0%):";
     if (colBase !== -1) rowSubGrabado[colBase] = subtotalIvaGrabado;
 
+<<<<<<< HEAD
     // Fila 3: Subtotal IVA 0%
+=======
+    // Row 3: Subtotal IVA 0%
+>>>>>>> 1736c7ce30857b06e6307f04ca06be043c92d249
     let rowSubCero = new Array(headers.length).fill("");
     rowSubCero[0] = "Subtotal IVA 0%:";
     if (colBase !== -1) rowSubCero[colBase] = subtotalIvaCero;
 
+<<<<<<< HEAD
     // Añadir estas filas al final (automáticamente actualiza el rango !ref)
     XLSX.utils.sheet_add_aoa(
       ws,
       [
         [], // Fila vacía para espaciado
+=======
+    // Append these rows
+    XLSX.utils.sheet_add_aoa(
+      ws,
+      [
+        [], // Empty row for spacing
+>>>>>>> 1736c7ce30857b06e6307f04ca06be043c92d249
         rowTotals,
         rowSubGrabado,
         rowSubCero,
       ],
+<<<<<<< HEAD
       { origin: -1 }
     );
 
@@ -417,5 +563,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const newFileName = originalFileName.replace(/\.txt$/i, "") + "_procesado.xlsx";
 
     XLSX.writeFile(wb, newFileName);
+=======
+      { origin: -1 },
+    );
+
+    // Export
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Comprobantes");
+
+    // Generate filename
+    const newFileName =
+      originalFileName.replace(".txt", "").replace(".TXT", "") +
+      "_procesado.xlsx";
+
+    XLSX.writeFile(wb, newFileName);
+
+    // Reset UI
+    statusArea.classList.add("hidden");
+    errorArea.innerHTML = `<div class="p-4 rounded-lg bg-green-50 text-green-700 text-center font-semibold">¡Archivo procesado y descargado exitosamente!</div>`;
+    errorArea.classList.remove("hidden");
+>>>>>>> 1736c7ce30857b06e6307f04ca06be043c92d249
   }
 });
